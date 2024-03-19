@@ -1,7 +1,7 @@
 .venv/
 *.config
 output*/
-__pycache__
+__pycache__/
 .vscode/
 .terraform/
 *.tfstate
