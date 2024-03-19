@@ -1,0 +1,53 @@
+hostname {{ config.hostname }}
+!
+vrf def PT
+ address-family ipv4 uni
+!
+vrf def CT
+ address-family ipv4 uni
+!
+crypto keyring INE vrf CT 
+  pre-shared-key address 0.0.0.0 0.0.0.0 key INE
+!
+crypto isakmp policy 5
+ encr aes
+ hash md5
+ authentication pre-share
+ group 5
+!
+crypto isakmp key INE address 0.0.0.0        
+!
+crypto isakmp profile INE
+   vrf CT
+   keyring INE
+   match identity address 0.0.0.0 CT
+!
+crypto ipsec transform-set INE esp-null esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile INE
+ set transform-set INE 
+ set isakmp-profile INE
+!
+interface GigabitEthernet1
+ vrf forwarding PT
+ ip address {{ convert_ip_format(config.ipv4_config.pt_address) }}
+ no shutdown
+!
+interface GigabitEthernet2
+ vrf forwarding CT
+ ip address {{ convert_ip_format(config.ipv4_config.ct_address) }}
+ no shutdown
+!
+{% for peer_enclave in config.peer_enclaves %}
+interface Tunnel{{ loop.index }}
+ vrf forwarding PT
+ ip unnumbered GigabitEthernet1
+ tunnel destination {{ peer_enclave.ecu_ct }}
+ tunnel source GigabitEthernet2
+ tunnel vrf CT
+ tunnel protection ipsec profile INE
+ip route vrf PT {{ convert_ip_format(peer_enclave.host, net=True) }} Tunnel{{ loop.index }} {{ peer_enclave.metric + 2 }}
+{% endfor %}
+ip route vrf PT 0.0.0.0 0.0.0.0 {{ config.ipv4_config.pt_gateway }} 1
+ip route vrf CT 0.0.0.0 0.0.0.0 {{ config.ipv4_config.ct_gateway }} 1
