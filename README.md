@@ -16,6 +16,14 @@ docker run -it ci_cli /bin/bash
 # Run the ci_cli.py tooling 
 python3 ci_cli.py (command) (options)
 ```
+### External software used
+- EVE-NG (Tested successfully with version 5.0.1-129)
+  - Must be loaded with an iosv l3 image AND csr1000v/csr8000v image
+- Linux box or system with Docker
+  - Linux box must have Python version >3.10 installed
+- Some CI tool (Gitlab/Jenkins/Circle/Argo/Travis etc.) (pipeline examples will use Gitlab CI)
+- Securecrt (optional)
+
 ## config.py
 The included config.py file can be modified to meet your needs by adding/removing functionality. By default, the majority of these configs are self explanatory, however the following specific to your lab deployment and should be adjusted:
 
@@ -51,6 +59,39 @@ These commands require the following environmental variables set for EVE login.
 - `EVE_PASSWORD` - Should be your password for EVE
 - `EVE_URL` - Full url for your local eve server (https://[eve-ip])
 I recommend creating a new EVE account specifically for this purpose, otherwise you will get constant login conflicts
+
+### build_ines
+```sh
+# python3 ci_cli.py build_ines --help
+root        : INFO     Logging initiated
+Usage: ci_cli.py build_ines [OPTIONS]
+
+  With self.source_path, open all configurations and build the config classes
+  associated with each. This will create a new txt file in the provided source
+  path. Generally this is ran before create configs if INEs are in play
+
+Options:
+  --source_path TEXT  MANDATORY: path to your configuration directory you want
+                      to convert  [required]
+  --help              Show this message and exit.
+```
+In some environments, "dumb" inline encryption devices sit between network enclaves. This command takes common parameters that a network encryption device uses, templates it into a Cisco configuration, and adds it to the source_path as a cisco configuration. This command should be ran before the create_configs file in order to create the correct templated configs.
+
+The script looks for all files in the source_path that end with `INE.yml`. The format of the YAML follows. The pt and ct configurations are templated into interfaces in PT and CT vrfs. The peer_enclaves configure static routes in the PT vrf pointing to the correct destination tunnel. The templated configuration uses basic `esp-null` ipsec encryption.
+```yaml
+hostname: MY_INE
+ipv4_config:
+  pt_address: 200.1.1.2/30
+  pt_gateway: 200.1.1.1
+  ct_address: 10.1.1.2/30
+  ct_gateway: 10.1.1.1
+
+peer_enclaves:
+  - ecu_ct: 10.2.1.2
+    ecu_pt: 200.2.1.2
+    host: 200.2.1.0/30
+    metric: 1
+```
 
 ### create_configs command
 ```sh
