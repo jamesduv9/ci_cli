@@ -77,8 +77,8 @@ Options:
 ```
 In some environments, "dumb" inline encryption devices sit between network enclaves. This command takes common parameters that a network encryption device uses, templates it into a Cisco configuration, and adds it to the source_path as a cisco configuration. This command should be ran before the create_configs file in order to create the correct templated configs.
 
-The script looks for all files in the source_path that end with `INE.yml`. The format of the YAML follows. The pt and ct configurations are templated into interfaces in PT and CT vrfs. The peer_enclaves configure static routes in the PT vrf pointing to the correct destination tunnel. The templated configuration uses basic `esp-null` ipsec encryption.
-```yaml
+The script looks for all files in the source_path that end with `INE.yml`. The format of the YAML follows. The pt and ct configurations are templated into interfaces in PT and CT vrfs. The peer_enclaves list configure static routes in the PT vrf pointing to the correct destination tunnel. The templated configuration uses basic `esp-null` ipsec encryption.
+```yml
 hostname: MY_INE
 ipv4_config:
   pt_address: 200.1.1.2/30
@@ -129,7 +129,7 @@ At a high level, here's how the create_configs command works:
 8. Add username and password of admin:admin to all devices
 9. Creates a labvars.json file that will later give instructions to `create_or_mod_lab` command
 10. Creates an overall_interface_map.json file that provides a map between previous production interfaces, and lab interface. This is later used in the test_handler.py job file
-11. Creates a folder called securecrt_sessions that provides a single securecrt ini file for each device in the topology with their new management GigabitEthernet2 address. Can easily drop this into your `%appdata%/roaming/VanDyke/sessions` folder 
+11. Creates a folder called securecrt_sessions that provides a single securecrt ini file for each device in the topology with their new management GigabitEthernet2 address. Can easily drop this into your `%appdata%/VanDyke/sessions` folder 
 
 ### create_or_mod_lab command
 ```sh
@@ -153,13 +153,13 @@ For the create action the following steps take place:
 2. Use the labvars.json as instructions to create an EVE-NG lab topology
 3. Waits 10 minutes to ensure all devices are powered up
 
-For the mod action the following steps take place:
+For the modification action the following steps take place:
 1. An API call is made to EVE to determine if the currently requested lab exists, if so, we need to modify the lab instead of create
 2. Grabs all the provided configurations and compares them with the saved startup configurations within EVE-NG
 3. Any node that has a different configuration is stopped, loaded with the correct config, wiped,   and reloaded
 4. Each of the nodes that did get reloaded are added to a special health_targets.json, which is used as an optional instruction in the `tb_and_health` command to narrow the scope of the health check
 
-## tb_and_health command
+### tb_and_health command
 ```sh
 # python3 ci_cli.py tb_and_health --help
 root        : INFO     Logging initiated
@@ -182,7 +182,7 @@ Options:
 This command creates a pyats testbed file for a given EVE-NG lab, and attempts to login to each node to test it's health using pyATS. Any device that does not appear healthy will be rebooted. 
 This command has an optional --health_targets option that can take in a json file from the `create_or_mod_lab` command that specifies to only test the health of certain nodes.
 
-## teardown_lab command
+### teardown_lab command
 ```sh
 # python3 ci_cli.py teardown_lab --help
 root        : INFO     Logging initiated
@@ -195,3 +195,9 @@ Options:
   --help           Show this message and exit.
 ```
 Does what the command says, given the provided lab_name this command will iterate through all nodes in a lab and shut them down and finally delete the lab altogether. This would be ran for example, when a merge request is merged and deleted in a CI pipeline.
+
+# test_handler.py
+This pyATS job file takes in a --test_directory that contains a series of tests defined as .yml files. There are specific types of tests predefined in the testscripts.py folder.
+
+
+Test documentation WIP
