@@ -1,5 +1,7 @@
 # ci_cli
 Tooling for a simple CI-CD (delivery) pipeline for Cisco IOS and IOS-XE devices using raw configurations instead of an IaC approach. Provides tooling to convert production configurations to lab configurations, deploy and maintain a lab in EVE-NG, create a pyATS testbed, and run predefined pyATS testscripts.
+![image](https://github.com/jamesduv9/ci_cli/assets/32336049/37868b2c-4373-4c37-a4d5-f57087dae8fb)
+
 ## Setup
 This tool can either be ran on a standalone linux box, or within a Docker container. It is recommended to use the provided Dockerfile definition, especially if this tool is used within a CI pipeline
 ### Docker image build
