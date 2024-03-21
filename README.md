@@ -199,7 +199,9 @@ Options:
 Does what the command says, given the provided lab_name this command will iterate through all nodes in a lab and shut them down and finally delete the lab altogether. This would be ran for example, when a merge request is merged and deleted in a CI pipeline.
 
 # test_handler.py
-This pyATS job file takes in a --test_directory that contains a series of tests defined as .yml files. There are specific types of tests predefined in the testscripts.py folder.
+This pyATS job file takes in a --test_directory that contains a series of tests defined as .yml files. There are specific types of tests predefined in the testscripts.py folder. Each of these tests have a specific YAML syntax that can be used to define a test without needing to be proficient in Python. The test_handler.py script iterates through all files in the provided test_directory and maps tests to testscripts based on the test `type`.
+
+Given that the testbed file is generated from the `tb_and_health` command, it should be simple to create and run your own tests against your lab topologies.
 
 
 Test documentation WIP
