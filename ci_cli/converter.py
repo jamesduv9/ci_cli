@@ -42,7 +42,7 @@ class Converter:
     def __init__(
         self,
         source_path: str,
-        gitlab_user: str,
+        user: str,
         configs: list[Configuration] = None,
         config_file_ext: str = ".txt",
         vlan_seed: int = 2,
@@ -56,12 +56,12 @@ class Converter:
         self.config_file_ext: str = config_file_ext
         self.vlan_seed: int = vlan_seed
         self.output_path: str = output_path
-        self.gitlab_user: str = gitlab_user
+        self.user: str = user
         try:
             self.management_subnet = ipaddress.IPv4Network(
-                MANAGEMENT_SUBNETS[self.gitlab_user]["management_network"])
+                MANAGEMENT_SUBNETS[self.user]["management_network"])
             self.management_gateway = ipaddress.IPv4Address(
-                MANAGEMENT_SUBNETS[self.gitlab_user]["management_default_gw"])
+                MANAGEMENT_SUBNETS[self.user]["management_default_gw"])
         except KeyError:
             logging.error("User's management network not found in config.py")
             sys.exit(1)

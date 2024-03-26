@@ -82,10 +82,10 @@ def main(ctx, debug_level):
     default=".txt", show_default=True
 )
 @click.option(
-    "--gitlab_user", help="GITLAB_USER_ID predefined var, used to find management subnet for specific user", required=True, type=click.STRING
+    "--user", help="maps user to management subnet; for example in a gitlab ci pipeline, can use the GITLAB_USER_ID predefined var", required=True, type=click.STRING
 )
 def create_configs(
-    logger, source_path: str, output_path: str, vlan_seed: str, config_file_ext: str, gitlab_user: str
+    logger, source_path: str, output_path: str, vlan_seed: str, config_file_ext: str, user: str
 ) -> None:
     """
     Takes your passed in directory of configurations with various interfaces formats them to work in an EVE lab
@@ -103,7 +103,7 @@ def create_configs(
         output_path=output_path,
         vlan_seed=vlan_seed,
         config_file_ext=config_file_ext,
-        gitlab_user=gitlab_user
+        user=user
     )
     
     # load all files with specified extension
